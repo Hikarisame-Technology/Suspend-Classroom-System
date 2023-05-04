@@ -1,0 +1,3 @@
+﻿Class SuspendTrue
+
+End Class

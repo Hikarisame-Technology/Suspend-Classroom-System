@@ -1,0 +1,3 @@
+﻿Class ResumeTrue
+
+End Class

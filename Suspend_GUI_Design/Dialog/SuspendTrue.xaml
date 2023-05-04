@@ -1,0 +1,13 @@
+﻿<muxc:ContentDialog
+    x:Class="SuspendTrue"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="http://schemas.modernwpf.com/2019"
+    Title="挂起成功"
+    CloseButtonText="确定"
+    DefaultButton="Close" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+        <TextBlock Text="请勿多次点击" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16"/>
+    </StackPanel>
+</muxc:ContentDialog>

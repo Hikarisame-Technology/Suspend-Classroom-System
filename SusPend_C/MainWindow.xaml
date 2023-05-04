@@ -1,0 +1,53 @@
+﻿<Window x:Class="SusPend_C.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:muxc="http://schemas.modernwpf.com/2019"
+        muxc:WindowHelper.UseModernWindowStyle="True"
+        xmlns:local="clr-namespace:SusPend_C"
+        mc:Ignorable="d" 
+        Height="320" Width="490" MinWidth="490" MinHeight="320" MaxWidth="490" MaxHeight="320" ResizeMode="CanMinimize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="46*"/>
+            <RowDefinition Height="11*"/>
+        </Grid.RowDefinitions>
+        <ListView x:Name="processListView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="216" Width="375">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="进程名称" DisplayMemberBinding="{Binding Name}" Width="250"/>
+                    <GridViewColumn Header="状态" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding State}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Setter Property="Foreground" Value="Green" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding State}" Value="已挂起">
+                                                    <Setter Property="Foreground" Value="Orange" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button Margin="385,143,0,0" Width="86" Height="34" x:Name="SuspendProcesses" Click="SuspendProcesses_Click" Content="挂起程序" VerticalAlignment="Top"/>
+        <Button Margin="385,182,0,0" VerticalAlignment="Top" Width="86" Height="34" x:Name="ResumeProcesses" Click="ResumeProcesses_Click" Content="解除控制"/>
+        <Button Margin="383,10,0,0" Width="86" Height="34" x:Name="Refresh" Click="Refresh_Click" Content="刷新" VerticalAlignment="Top"/>
+        <Border BorderThickness="1,1,1,1" HorizontalAlignment="Center" Height="59" Grid.Row="1" VerticalAlignment="Center" Width="490" Background="#FF2D2D2D" CornerRadius="10,10,0,0">
+            <TextBlock Text="当前未加入列表实时更新 若被控端重启请手动刷新&#xD;&#xA;当前仅针对极域/锐捷/红蜘蛛/噢易/伽卡他卡进行挂起"
+                       Foreground="White" 
+                       HorizontalAlignment="Center" 
+                       VerticalAlignment="Center"
+                       TextAlignment="Center" FontSize="11" FontWeight="Light"/>
+        </Border>
+
+    </Grid>
+</Window>

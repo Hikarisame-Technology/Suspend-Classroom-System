@@ -1,0 +1,3 @@
+﻿Class AboutDialog
+
+End Class

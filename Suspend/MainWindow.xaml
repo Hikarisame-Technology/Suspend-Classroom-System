@@ -1,0 +1,27 @@
+﻿<Window x:Name="Window_T" x:Class="MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:muxc="http://schemas.modernwpf.com/2019"
+        muxc:WindowHelper.UseModernWindowStyle="True"
+        xmlns:local="clr-namespace:Suspend_GUI_Design"
+        mc:Ignorable="d"
+        Title="Fucking Classroom System" Height="260" Width="465" HorizontalAlignment="Center" VerticalAlignment="Center" FlowDirection="LeftToRight" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" MinHeight="260" MaxHeight="260" MinWidth="465" MaxWidth="465">
+    <Grid x:Name="Gr" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <TextBox x:Name="Pids1" TextWrapping="Wrap" Margin="175,40,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="258" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="20"/>
+        <TextBox x:Name="Pids2" TextWrapping="Wrap" Margin="175,77,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="258" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="20" IsTabStop="False" IsReadOnly="True"/>
+        <Button x:Name="cmdSuspend" Content="挂起线程" Margin="266,120,0,0" VerticalAlignment="Top" Height="30" Width="75"/>
+        <Button x:Name="cmdResume" Content="继续运行" Margin="358,120,0,0" VerticalAlignment="Top" Height="30" Width="75"/>
+        <Button x:Name="GetPid" Content="获取PID" Height="30" Margin="175,120,0,0" VerticalAlignment="Top" Width="75" HorizontalContentAlignment="Center"/>
+        <RadioButton x:Name="JiYuKill" Content="极域电子教室" Margin="10,35,0,0" VerticalAlignment="Top" ToolTip="运行参数 -JiYu" Padding="8,7,0,0"/>
+        <RadioButton x:Name="RuiJieKill" Content="锐捷云课堂" Margin="10,72,0,0" VerticalAlignment="Top" ToolTip="运行参数 -RuiJie" Padding="8,7,0,0"/>
+        <RadioButton x:Name="RedSpiderKill" Content="红蜘蛛" Margin="10,109,0,0" VerticalAlignment="Top" ToolTip="运行参数 -RedSpider" Padding="8,7,0,0"/>
+        <RadioButton x:Name="OsEasyKill" Content="噢易多媒体" Margin="10,146,0,0" VerticalAlignment="Top" ToolTip="运行参数 -OsEasy" Padding="8,7,0,0"/>
+        <Label x:Name="Directions" Content="使用说明" VerticalAlignment="Top" FontSize="10" HorizontalContentAlignment="Center" Cursor="Hand" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="10,6,0,0" Height="20" Width="50"/>
+        <Label x:Name="Tip" Content="" HorizontalAlignment="Center" Margin="145,165,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15"/>
+        <Label x:Name="HKS" Content="Program By Hikarisame Technology Studio" ToolTip="软件免责声明" VerticalAlignment="Top" FontSize="10" HorizontalContentAlignment="Center" Cursor="Hand" HorizontalAlignment="Right" Margin="0,10,55,0"/>
+        <Label x:Name="Web" Content="软件官网" ToolTip="软件官网(双击进入)" VerticalAlignment="Bottom" FontSize="10" HorizontalContentAlignment="Center" Cursor="Hand" HorizontalAlignment="Left" Margin="40,0,0,20"/>
+    </Grid>
+</Window>
+

@@ -1,0 +1,22 @@
+﻿<muxc:ContentDialog
+    x:Class="ManualDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="http://schemas.modernwpf.com/2019"
+    Title="使用说明"
+    CloseButtonText="确定"
+    DefaultButton="Close" Loaded="ContentDialog_Loaded">
+
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Bottom">
+        <!-- Content body -->
+        <TextBlock>
+            <Run>选择对应控制端按钮后点击获取PID</Run>
+            <LineBreak/>
+            <Run>若上方有文本框内显示Null则说明未获取到 需要重新选择或者获取</Run>
+            <LineBreak/>
+            <Run>若显示数字则点击挂起线程即可</Run>
+            <LineBreak/>
+            <Run>需要继续运行控制端则点击继续运行即可</Run>
+        </TextBlock>
+    </StackPanel>
+</muxc:ContentDialog>

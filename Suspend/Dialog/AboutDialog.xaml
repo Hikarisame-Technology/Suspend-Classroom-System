@@ -1,0 +1,22 @@
+﻿<muxc:ContentDialog
+    x:Class="AboutDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:muxc="http://schemas.modernwpf.com/2019"
+    Title="免责声明"
+    CloseButtonText="确定"
+    DefaultButton="Close" VerticalContentAlignment="Center" HorizontalContentAlignment="Center">
+
+    <StackPanel>
+        <!-- Content body -->
+        <TextBlock FontSize="11" >
+            <Run>该软件为光霂科技工作室(Hikarisame Technology Studio)制作编写</Run>
+            <LineBreak/>
+            <Run>使用此软件代表同意该软件的免责声明</Run>
+            <LineBreak/>
+            <Run>使用该软件出现的一切问题由用户承担</Run>
+            <LineBreak/>
+            <Run>仅供学习 软件作者不承担一切后果 感谢您的使用</Run>
+        </TextBlock>
+    </StackPanel>
+</muxc:ContentDialog>
