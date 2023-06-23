@@ -1,18 +1,16 @@
-﻿using System;
+﻿using ModernWpf.Controls;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Data;
+using System.Windows.Interop;
 
 namespace SusPend_C
 {
-
     public partial class MainWindow : Window
     {
-        private const int PROCESS_SUSPEND_RESUME = 0x0800;
-
         [DllImport("ntdll.dll")]
         private static extern int NtSuspendProcess(IntPtr processHandle);
 
@@ -21,6 +19,17 @@ namespace SusPend_C
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        private const int PROCESS_SUSPEND_RESUME = 0x0800;
+
+        private const uint SWP_NOMOVE = 0x0002;
+        private const uint SWP_NOSIZE = 0x0001;
+        private const int HWND_TOPMOST = -1;
+        private const int HWND_NOTOPMOST = -2;
+
 
         public MainWindow()
         {
@@ -37,9 +46,12 @@ namespace SusPend_C
             foreach (string processName in processNames)
             {
                 Process[] processes = Process.GetProcessesByName(processName);
+                int count = 1;
                 foreach (Process process in processes)
                 {
-                    processList.Add(new ProcessItem(process.ProcessName, false));
+                    string nameWithCount = processName + " " + count;
+                    processList.Add(new ProcessItem(nameWithCount, false));
+                    count++;
                 }
             }
             return processList;
@@ -49,11 +61,12 @@ namespace SusPend_C
         {
             foreach (ProcessItem processItem in processListView.Items)
             {
-                Process[] processes = Process.GetProcessesByName(processItem.Name);
+                string baseProcessName = processItem.Name.Split(' ')[0];
+                Process[] processes = Process.GetProcessesByName(baseProcessName);
                 bool isSuspended = false;
-                foreach (Process process in Process.GetProcesses())
+                foreach (Process process in processes)
                 {
-                    if (process.ProcessName == processItem.Name && process.Threads[0].ThreadState == ThreadState.Wait && process.Threads[0].WaitReason == ThreadWaitReason.Suspended)
+                    if (process.ProcessName == processItem.Name.Split(' ')[0] && process.Threads[0].ThreadState == ThreadState.Wait && process.Threads[0].WaitReason == ThreadWaitReason.Suspended)
                     {
                         isSuspended = true;
                         break;
@@ -68,8 +81,11 @@ namespace SusPend_C
         {
             foreach (ProcessItem processItem in processListView.Items)
             {
-                //if (processItem.State == "已挂起") continue;
-                Process[] processes = Process.GetProcessesByName(processItem.Name);
+                if (processItem.State == "已挂起")
+                {
+                    continue;
+                }
+                Process[] processes = Process.GetProcessesByName(processItem.Name.Split(' ')[0]);
                 if (processes.Length > 0)
                 {
                     foreach (Process process in processes)
@@ -94,15 +110,14 @@ namespace SusPend_C
                     }
                 }
             }
-            processListView.Items.Refresh();
+            processListView.ItemsSource = GetProcessList();
             RefreshProcesses();
         }
         private void ResumeProcesses_Click(object sender, RoutedEventArgs e)
         {
             foreach (ProcessItem processItem in processListView.Items)
             {
-                //if (processItem.State == "正在运行") continue;
-                Process[] processes = Process.GetProcessesByName(processItem.Name);
+                Process[] processes = Process.GetProcessesByName(processItem.Name.Split(' ')[0]);
                 if (processes.Length > 0)
                 {
                     foreach (Process process in processes)
@@ -127,7 +142,7 @@ namespace SusPend_C
                     }
                 }
             }
-            processListView.Items.Refresh();
+            processListView.ItemsSource = GetProcessList();
             RefreshProcesses();
         }
 
@@ -135,6 +150,61 @@ namespace SusPend_C
         {
             processListView.ItemsSource = GetProcessList();
             RefreshProcesses();
+        }
+
+        private void TopCheck_Checked(object sender, RoutedEventArgs e)
+        {
+            Topmost = true;
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            SetWindowPos(helper.Handle, new IntPtr(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        }
+
+        private void TopCheck_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Topmost = false;
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            SetWindowPos(helper.Handle, new IntPtr(HWND_NOTOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+        }
+
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            var fileName = Process.GetCurrentProcess().MainModule.FileName;
+            ContentDialog DelorExitDialog = new ContentDialog
+            {
+                Title = "是否使用自爆(自我删除)",
+                Content = "点击删除则倒计时10秒后退出并自动删除本体",
+                PrimaryButtonText = "删除",
+                CloseButtonText = "退出",
+                DefaultButton = ContentDialogButton.Close
+            };
+            ContentDialogResult result = await DelorExitDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                DeleteProcessFile(fileName, 4);
+                Environment.Exit(0);
+            }
+            else {
+                Environment.Exit(0);
+            }
+        }
+
+        private static void DeleteProcessFile(string fileName, int DelaySecond)
+        {
+            fileName = Path.GetFullPath(fileName);
+            var folder = Path.GetDirectoryName(fileName);
+            var CurrentProcessFileName = Path.GetFileName(fileName);
+            var arguments = $"/c timeout /t {DelaySecond} && DEL /f {CurrentProcessFileName} ";
+            var processStartInfo = new ProcessStartInfo()
+            {
+                Verb = "runas",
+                FileName = "cmd",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                Arguments = arguments,
+                WorkingDirectory = folder,
+            };
+            Process.Start(processStartInfo);
         }
     }
 

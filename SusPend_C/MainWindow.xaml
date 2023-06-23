@@ -7,16 +7,20 @@
         muxc:WindowHelper.UseModernWindowStyle="True"
         xmlns:local="clr-namespace:SusPend_C"
         mc:Ignorable="d" 
-        Height="320" Width="490" MinWidth="490" MinHeight="320" MaxWidth="490" MaxHeight="320" ResizeMode="CanMinimize">
+        Height="320" Width="500" MinWidth="500" MinHeight="320" MaxWidth="500" MaxHeight="320" ResizeMode="CanMinimize" Closing="Window_Closing">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="201*"/>
+            <ColumnDefinition Width="49*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="46*"/>
-            <RowDefinition Height="11*"/>
+            <RowDefinition Height="48*"/>
+            <RowDefinition Height="13*"/>
         </Grid.RowDefinitions>
-        <ListView x:Name="processListView" HorizontalAlignment="Left" VerticalAlignment="Top" Height="216" Width="375">
+        <ListView x:Name="processListView">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="进程名称" DisplayMemberBinding="{Binding Name}" Width="250"/>
+                    <GridViewColumn Header="进程名称" DisplayMemberBinding="{Binding Name}" Width="280"/>
                     <GridViewColumn Header="状态" Width="100">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -38,16 +42,19 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Margin="385,143,0,0" Width="86" Height="34" x:Name="SuspendProcesses" Click="SuspendProcesses_Click" Content="挂起程序" VerticalAlignment="Top"/>
-        <Button Margin="385,182,0,0" VerticalAlignment="Top" Width="86" Height="34" x:Name="ResumeProcesses" Click="ResumeProcesses_Click" Content="解除控制"/>
-        <Button Margin="383,10,0,0" Width="86" Height="34" x:Name="Refresh" Click="Refresh_Click" Content="刷新" VerticalAlignment="Top"/>
-        <Border BorderThickness="1,1,1,1" HorizontalAlignment="Center" Height="59" Grid.Row="1" VerticalAlignment="Center" Width="490" Background="#FF2D2D2D" CornerRadius="10,10,0,0">
-            <TextBlock Text="当前未加入列表实时更新 若被控端重启请手动刷新&#xD;&#xA;当前仅针对极域/锐捷/红蜘蛛/噢易/伽卡他卡进行挂起"
-                       Foreground="White" 
-                       HorizontalAlignment="Center" 
-                       VerticalAlignment="Center"
-                       TextAlignment="Center" FontSize="11" FontWeight="Light"/>
+        <Border Grid.Column="1" Grid.RowSpan="2" Background="#FF2D2D2D" CornerRadius="10,0,0,0" Width="99"/>
+        <Button Margin="0,95,0,0" Width="86" Height="34" x:Name="SuspendProcesses" Click="SuspendProcesses_Click" Content="挂起程序" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Button Margin="0,135,0,0" VerticalAlignment="Top" Width="86" Height="34" x:Name="ResumeProcesses" Click="ResumeProcesses_Click" Content="解除控制" Grid.Column="1" HorizontalAlignment="Center"/>
+        <Button Margin="0,50,0,0" Width="86" Height="34" x:Name="Refresh" Click="Refresh_Click" Content="刷新" VerticalAlignment="Top" Grid.Column="1" HorizontalAlignment="Center"/>
+
+        <CheckBox x:Name="TopCheck" Content="置顶" Margin="0,10,0,0" VerticalAlignment="Top" Checked="TopCheck_Checked" IsChecked="False" ScrollViewer.VerticalScrollBarVisibility="Auto" Width="62" Height="30" MinWidth="63" MinHeight="30" Unchecked="TopCheck_Unchecked" Grid.Column="1" HorizontalAlignment="Center"/>
+
+        <Border Grid.Row="1" Background="#FF2D2D2D" CornerRadius="10,0,0,0">
+            <TextBlock Text="当前未加入列表实时更新 若被控端重启请手动刷新&#xA;当前仅针对极域/锐捷/红蜘蛛/噢易/伽卡他卡进行挂起"
+                       Foreground="White"
+                       TextAlignment="Center" FontSize="12" FontWeight="Light" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Border>
+
 
     </Grid>
 </Window>
