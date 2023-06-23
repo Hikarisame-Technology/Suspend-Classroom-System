@@ -20,10 +20,18 @@ namespace SusPend_C
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
+
         [DllImport("user32.dll")]
         private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
         private const int PROCESS_SUSPEND_RESUME = 0x0800;
+        private const int PROCESS_ALL_ACCESS = 0x0001;
 
         private const uint SWP_NOMOVE = 0x0002;
         private const uint SWP_NOSIZE = 0x0001;
@@ -34,13 +42,13 @@ namespace SusPend_C
         public MainWindow()
         {
             InitializeComponent();
-            processListView.ItemsSource = GetProcessList();
-            RefreshProcesses();
+            RefreshProcesses_ListView();
             this.Title = "Fucking Classroom System Ver" + Application.ResourceAssembly.GetName().Version.ToString().ToString();
         }
 
         private List<ProcessItem> GetProcessList()
         {
+            // 获取正在运行的程序列表
             List<ProcessItem> processList = new List<ProcessItem>();
             string[] processNames = new string[] { "StudentMain", "CMLauncher", "ClassManagerApp", "REDAgent", "Student", "MultiClient", "Smonitor", "EnigmaVBUnpacker" };//EnigmaVBUnpacker为测试用例
             foreach (string processName in processNames)
@@ -59,6 +67,7 @@ namespace SusPend_C
 
         private void RefreshProcesses()
         {
+            // 刷新进程
             foreach (ProcessItem processItem in processListView.Items)
             {
                 string baseProcessName = processItem.Name.Split(' ')[0];
@@ -76,9 +85,16 @@ namespace SusPend_C
             }
         }
 
+        private void RefreshProcesses_ListView()
+        {
+            processListView.ItemsSource = GetProcessList();
+            RefreshProcesses();
+        }
+
 
         private void SuspendProcesses_Click(object sender, RoutedEventArgs e)
         {
+            // 挂起程序
             foreach (ProcessItem processItem in processListView.Items)
             {
                 if (processItem.State == "已挂起")
@@ -102,6 +118,7 @@ namespace SusPend_C
                             {
                                 MessageBox.Show(processItem.Name + " 进程挂起失败：" + result.ToString());
                             }
+                            CloseHandle(processHandle);
                         }
                         else
                         {
@@ -110,11 +127,11 @@ namespace SusPend_C
                     }
                 }
             }
-            processListView.ItemsSource = GetProcessList();
-            RefreshProcesses();
+            RefreshProcesses_ListView();
         }
         private void ResumeProcesses_Click(object sender, RoutedEventArgs e)
         {
+            // 恢复运行
             foreach (ProcessItem processItem in processListView.Items)
             {
                 Process[] processes = Process.GetProcessesByName(processItem.Name.Split(' ')[0]);
@@ -134,6 +151,7 @@ namespace SusPend_C
                             {
                                 MessageBox.Show(processItem.Name + " 进程恢复运行失败：" + result.ToString());
                             }
+                            CloseHandle(processHandle);
                         }
                         else
                         {
@@ -142,14 +160,51 @@ namespace SusPend_C
                     }
                 }
             }
-            processListView.ItemsSource = GetProcessList();
-            RefreshProcesses();
+            RefreshProcesses_ListView();
+        }
+
+        private void Network_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Kill_Click(object sender, RoutedEventArgs e)
+        {
+            // 杀死程序
+            foreach (ProcessItem processItem in processListView.Items)
+            {
+                Process[] processes = Process.GetProcessesByName(processItem.Name.Split(' ')[0]);
+                if (processes.Length > 0)
+                {
+                    foreach (Process process in processes)
+                    {
+                        IntPtr processHandle = OpenProcess(PROCESS_ALL_ACCESS, false, process.Id);
+                        if (processHandle != IntPtr.Zero)
+                        {
+                            if (TerminateProcess(processHandle, 0))
+                            {
+                                Console.WriteLine("结束并刷新");
+                                RefreshProcesses_ListView();
+                            }
+                            else
+                            {
+                                Console.WriteLine(processItem.Name + " 结束进程失败，错误代码：" + Marshal.GetLastWin32Error());
+                            }
+                            CloseHandle(processHandle);
+                        }
+                        else
+                        {
+                            MessageBox.Show("无法打开进程句柄。错误代码: " + Marshal.GetLastWin32Error());
+                        }
+                    }
+                }
+            }
+            RefreshProcesses_ListView();
         }
 
         private void Refresh_Click(object sender, RoutedEventArgs e)
         {
-            processListView.ItemsSource = GetProcessList();
-            RefreshProcesses();
+            RefreshProcesses_ListView();
         }
 
         private void TopCheck_Checked(object sender, RoutedEventArgs e)
@@ -206,12 +261,14 @@ namespace SusPend_C
             };
             Process.Start(processStartInfo);
         }
+
     }
 
     public class ProcessItem
     {
         public string Name { get; set; }
         public string State { get; set; }
+        public string Kill { get; set; }
 
         public ProcessItem(string name, bool isSuspended)
         {
