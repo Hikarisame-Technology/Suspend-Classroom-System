@@ -39,12 +39,14 @@ namespace SusPend_C
         private const int HWND_TOPMOST = -1;
         private const int HWND_NOTOPMOST = -2;
 
+        private System.Windows.Forms.NotifyIcon notifyIcon;
 
         public MainWindow()
         {
             InitializeComponent();
             RefreshProcesses_ListView();
             this.Title = "Fucking Classroom System Ver" + Application.ResourceAssembly.GetName().Version.ToString().ToString();
+            NotifyIcon_Dis();
         }
 
         private List<ProcessItem> GetProcessList()
@@ -257,7 +259,7 @@ namespace SusPend_C
             ContentDialog DelorExitDialog = new ContentDialog
             {
                 Title = "是否使用自爆(自我删除)",
-                Content = "点击删除则倒计时10秒后退出并自动删除本体",
+                Content = "点击删除则自动退出并删除本体",
                 PrimaryButtonText = "删除",
                 CloseButtonText = "退出",
                 DefaultButton = ContentDialogButton.Close
@@ -291,6 +293,57 @@ namespace SusPend_C
             Process.Start(processStartInfo);
         }
 
+        private void NotifyIcon_Dis() {
+            var fileName = Process.GetCurrentProcess().MainModule.FileName;
+
+            notifyIcon = new System.Windows.Forms.NotifyIcon
+            {
+                BalloonTipText = "Fucking Classroom System"
+            };
+            notifyIcon.ShowBalloonTip(2000);
+            notifyIcon.Text = "Fucking Classroom System";
+            notifyIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
+            notifyIcon.Visible = false;
+            notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+            notifyIcon.ContextMenuStrip.Items.Add("显示主窗口", null, (sender, eventArgs) =>
+            {
+                Show();
+                Visibility = Visibility.Visible;
+                WindowState = WindowState.Normal;
+                ShowInTaskbar = true;
+                notifyIcon.Visible = false;
+            });
+            notifyIcon.ContextMenuStrip.Items.Add("自爆(4秒)", null, (sender, eventArgs) =>
+            {
+                notifyIcon.Dispose();
+                DeleteProcessFile(fileName,4);
+                Environment.Exit(0);
+            });
+            notifyIcon.ContextMenuStrip.Items.Add("关闭程序", null, (sender, eventArgs) =>
+            {
+                notifyIcon.Dispose();
+                Environment.Exit(0);
+            });
+            //托盘双击响应
+            notifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler((o, e) =>
+            {
+                if (e.Button == System.Windows.Forms.MouseButtons.Left)
+                {
+                    notifyIcon.ContextMenuStrip.Items[0].PerformClick();
+                }
+            });
+        }
+
+        private void Window_StateChanged(object sender, EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                notifyIcon.Visible = true;
+                ShowInTaskbar = false;
+                Visibility = Visibility.Hidden;
+                notifyIcon.ShowBalloonTip(20, "提示", "Fucking Classroom System已最小化至托盘", System.Windows.Forms.ToolTipIcon.Info);
+            }
+        }
     }
 
     public class ProcessItem

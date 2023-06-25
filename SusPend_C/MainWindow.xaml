@@ -7,7 +7,7 @@
         muxc:WindowHelper.UseModernWindowStyle="True"
         xmlns:local="clr-namespace:SusPend_C"
         mc:Ignorable="d" 
-        Height="320" Width="500" MinWidth="500" MinHeight="320" MaxWidth="500" MaxHeight="320" ResizeMode="CanMinimize" Closing="Window_Closing" Background="Black">
+        Height="320" Width="500" MinWidth="500" MinHeight="320" MaxWidth="500" MaxHeight="320" ResizeMode="CanMinimize" Closing="Window_Closing" Background="Black" StateChanged="Window_StateChanged">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="201*"/>
