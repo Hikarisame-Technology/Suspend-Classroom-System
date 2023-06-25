@@ -49,7 +49,7 @@
         <Button Margin="0,95,0,0" Width="86" Height="34" x:Name="SuspendProcesses" Click="SuspendProcesses_Click" Content="挂起程序" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Top"/>
         <Button Margin="0,135,0,0" VerticalAlignment="Top" Width="86" Height="34" x:Name="ResumeProcesses" Click="ResumeProcesses_Click" Content="解除控制" Grid.Column="1" HorizontalAlignment="Center"/>
         <Button Margin="0,50,0,0" Width="86" Height="34" x:Name="Refresh" Click="Refresh_Click" Content="刷新" VerticalAlignment="Top" Grid.Column="1" HorizontalAlignment="Center"/>
-        <Button Width="86" Height="34" x:Name="Network" Content="一键断网" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.Column="1" Grid.RowSpan="2" Margin="0,0,0,50" Click="Network_Click"/>
+        <Button Width="86" Height="34" x:Name="Network" Content="网络禁用" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.Column="1" Grid.RowSpan="2" Margin="0,0,0,50" Click="Network_Click"/>
         <Button Width="86" Height="34" x:Name="Kill" Content="结束全部" Grid.Column="1" HorizontalAlignment="Center" Grid.Row="1" VerticalAlignment="Bottom" Margin="0,0,0,10" Click="Kill_Click"/>
 
         <CheckBox x:Name="TopCheck" Content="置顶" Margin="0,10,0,0" VerticalAlignment="Top" Checked="TopCheck_Checked" IsChecked="False" ScrollViewer.VerticalScrollBarVisibility="Auto" Width="62" Height="30" MinWidth="63" MinHeight="30" Unchecked="TopCheck_Unchecked" Grid.Column="1" HorizontalAlignment="Center"/>

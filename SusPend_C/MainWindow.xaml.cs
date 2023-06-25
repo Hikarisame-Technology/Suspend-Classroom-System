@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -50,7 +51,7 @@ namespace SusPend_C
         {
             // 获取正在运行的程序列表
             List<ProcessItem> processList = new List<ProcessItem>();
-            string[] processNames = new string[] { "StudentMain", "CMLauncher", "ClassManagerApp", "REDAgent", "Student", "MultiClient", "Smonitor", "EnigmaVBUnpacker" };//EnigmaVBUnpacker为测试用例
+            string[] processNames = new string[] { "StudentMain", "CMLauncher", "CMService", "ClassManagerApp", "REDAgent", "Student", "MultiClient", "Smonitor", "EnigmaVBUnpacker" };//EnigmaVBUnpacker为测试用例
             foreach (string processName in processNames)
             {
                 Process[] processes = Process.GetProcessesByName(processName);
@@ -165,7 +166,35 @@ namespace SusPend_C
 
         private void Network_Click(object sender, RoutedEventArgs e)
         {
+            // 断网
+            try
+            {
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_NetworkAdapter WHERE PNPDeviceID LIKE 'PCI%'");
+                ManagementObjectCollection adapterCollection = searcher.Get();
 
+                foreach (ManagementObject adapter in adapterCollection)
+                {
+                    if (adapter.GetPropertyValue("NetConnectionStatus") != null )
+                    {
+                        if (adapter.GetPropertyValue("NetConnectionStatus").ToString() == "2") // 2为有链接的网络状态
+                        {
+                            adapter.InvokeMethod("Disable", null); // 停用适配器
+                            Console.WriteLine("Adapter disabled.");
+                            Network.Content = "网络恢复";
+                        }
+                        else if(adapter.GetPropertyValue("NetConnectionStatus").ToString() == "0") // 0为禁用
+                        {
+                            adapter.InvokeMethod("Enable", null); // 启用适配器
+                            Console.WriteLine("Adapter enabled.");
+                            Network.Content = "网络禁用";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("禁用/启用网络出现错误" + ex.Message);
+            }
         }
 
         private void Kill_Click(object sender, RoutedEventArgs e)
@@ -268,7 +297,6 @@ namespace SusPend_C
     {
         public string Name { get; set; }
         public string State { get; set; }
-        public string Kill { get; set; }
 
         public ProcessItem(string name, bool isSuspended)
         {
