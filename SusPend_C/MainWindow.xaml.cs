@@ -7,6 +7,7 @@ using System.Management;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Threading;
 
 namespace SusPend_C
 {
@@ -41,12 +42,47 @@ namespace SusPend_C
 
         private System.Windows.Forms.NotifyIcon notifyIcon;
 
+        const int WM_TIMER = 0x0113;
+        const int TIMER_ID = 1;
+        private DispatcherTimer timer;
+
         public MainWindow()
         {
             InitializeComponent();
             RefreshProcesses_ListView();
             this.Title = "Fucking Classroom System Ver" + Application.ResourceAssembly.GetName().Version.ToString().ToString();
             NotifyIcon_Dis();
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(1);
+            timer.Tick += Timer_Tick;
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            BringWindowToTop(new WindowInteropHelper(this).Handle);
+        }
+
+        private void BringWindowToTop(IntPtr hWnd)
+        {
+            WindowInteropHelper helper = new WindowInteropHelper(this);
+            SetWindowPos(hWnd, new IntPtr(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+        }
+
+        private void TopCheck_Checked(object sender, RoutedEventArgs e)
+        {
+            //Topmost = true;
+            //WindowInteropHelper helper = new WindowInteropHelper(this);
+            //SetWindowPos(helper.Handle, new IntPtr(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+            timer.Start();
+        }
+
+        private void TopCheck_Unchecked(object sender, RoutedEventArgs e)
+        {
+            timer.Stop();
+            //Topmost = false;
+            //WindowInteropHelper helper = new WindowInteropHelper(this);
+            //SetWindowPos(helper.Handle, new IntPtr(HWND_NOTOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
         }
 
         private List<ProcessItem> GetProcessList()
@@ -238,20 +274,6 @@ namespace SusPend_C
             RefreshProcesses_ListView();
         }
 
-        private void TopCheck_Checked(object sender, RoutedEventArgs e)
-        {
-            Topmost = true;
-            WindowInteropHelper helper = new WindowInteropHelper(this);
-            SetWindowPos(helper.Handle, new IntPtr(HWND_TOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-        }
-
-        private void TopCheck_Unchecked(object sender, RoutedEventArgs e)
-        {
-            Topmost = false;
-            WindowInteropHelper helper = new WindowInteropHelper(this);
-            SetWindowPos(helper.Handle, new IntPtr(HWND_NOTOPMOST), 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-        }
-
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = true;
@@ -261,18 +283,26 @@ namespace SusPend_C
                 Title = "是否使用自爆(自我删除)",
                 Content = "点击删除则自动退出并删除本体",
                 PrimaryButtonText = "删除",
-                CloseButtonText = "退出",
-                DefaultButton = ContentDialogButton.Close
+                SecondaryButtonText = "退出",
+                CloseButtonText = "取消",
+                DefaultButton = ContentDialogButton.Secondary
             };
             ContentDialogResult result = await DelorExitDialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
-                DeleteProcessFile(fileName, 4);
+                DeleteProcessFile(fileName, 10);
+                notifyIcon.Dispose();
+                Environment.Exit(0);
+            }
+            else if (result == ContentDialogResult.Secondary)
+            {
+                notifyIcon.Dispose();
                 Environment.Exit(0);
             }
             else {
-                Environment.Exit(0);
+                DelorExitDialog.Hide();
             }
+
         }
 
         private static void DeleteProcessFile(string fileName, int DelaySecond)
@@ -303,7 +333,7 @@ namespace SusPend_C
             notifyIcon.ShowBalloonTip(2000);
             notifyIcon.Text = "Fucking Classroom System";
             notifyIcon.Icon = System.Drawing.Icon.ExtractAssociatedIcon(System.Windows.Forms.Application.ExecutablePath);
-            notifyIcon.Visible = false;
+            notifyIcon.Visible = true;
             notifyIcon.ContextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
             notifyIcon.ContextMenuStrip.Items.Add("显示主窗口", null, (sender, eventArgs) =>
             {
@@ -311,9 +341,8 @@ namespace SusPend_C
                 Visibility = Visibility.Visible;
                 WindowState = WindowState.Normal;
                 ShowInTaskbar = true;
-                notifyIcon.Visible = false;
             });
-            notifyIcon.ContextMenuStrip.Items.Add("自爆(4秒)", null, (sender, eventArgs) =>
+            notifyIcon.ContextMenuStrip.Items.Add("自爆(10秒)", null, (sender, eventArgs) =>
             {
                 notifyIcon.Dispose();
                 DeleteProcessFile(fileName,4);
@@ -338,7 +367,6 @@ namespace SusPend_C
         {
             if (WindowState == WindowState.Minimized)
             {
-                notifyIcon.Visible = true;
                 ShowInTaskbar = false;
                 Visibility = Visibility.Hidden;
                 notifyIcon.ShowBalloonTip(20, "提示", "Fucking Classroom System已最小化至托盘", System.Windows.Forms.ToolTipIcon.Info);
